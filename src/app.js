@@ -10,9 +10,10 @@ const app = express();
 // middleware
 app.use(cors({
   origin: [
-    'https://college-complaint-system-frontend.vercel.app/',  
+    'https://college-complaint-system-frontend.vercel.app',  
     'http://localhost:5173'               
   ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
 app.use(express.json());

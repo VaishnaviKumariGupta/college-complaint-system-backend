@@ -2,6 +2,7 @@ const express = require('express');
 const router= express.Router();
 const userController = require('../controllers/user.controller');
 const {protect, admin} = require("../middleware/auth");
+const User = require('../models/user.model');
 
 
 // register route
