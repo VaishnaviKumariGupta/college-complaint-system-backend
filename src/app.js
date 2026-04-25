@@ -16,14 +16,7 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
-// app.use(express.json());
-
-app.use((req, res, next) => {
-  if (req.headers['content-type']?.includes('multipart/form-data')) {
-    return next(); // multer handle karega
-  }
-  express.json()(req, res, next);
-});
+app.use(express.json());
 
 
 // test route
