@@ -1,11 +1,21 @@
 const complaintModel = require('../models/complaint.model');
+const { uploadFile } = require("../services/storage.service");
 
 
 // create new complaint (only student)
 // POST /api/complaints
 const createComplaint = async (req, res) => {
     try {
-        const { title, department, category, description, photo } = req.body;
+        console.log('req.body:', req.body);
+        console.log('req.file:', req.file);
+         
+        const { title, department, category, description } = req.body;
+
+        let uri = '';
+        if (req.file) {
+            const result = await uploadFile(req.file.buffer.toString('base64'));
+            uri = result.url;
+        }
 
         const complaint = await complaintModel.create({
             student: req.user._id,  //logged in user ki id
@@ -13,15 +23,15 @@ const createComplaint = async (req, res) => {
             department,
             category,
             description,
-            photo
+            uri
         })
 
         res.status(201).json({
             message: "Complaint created successfully",
             complaint
         })
-    } catch (errpr) {
-        res.status(500).json({ message: errpr.message })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
     }
 }
 
@@ -31,9 +41,9 @@ const createComplaint = async (req, res) => {
 const getAllComplaints = async (req, res) => {
     try {
         const complaints = await complaintModel.find().populate('student', 'name email department').sort({ createdAt: -1 });
-        
+
         if (complaints.length === 0) {
-            return res.json({ message: "No complaints yet", complaints})
+            return res.json({ message: "No complaints yet", complaints })
         }
 
         res.status(201).json(complaints);
@@ -95,6 +105,9 @@ const deleteComplaint = async (req, res) => {
         if (!complaint) {
             return res.status(404).json({ message: "Complaint not found" });
         }
+
+        if (complaint.status !== 'Resolved')
+            return res.status(400).json({ message: 'Only Resolved complaints can be deleted' });
 
         await complaint.deleteOne();
 

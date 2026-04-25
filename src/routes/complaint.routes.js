@@ -1,5 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const upload = multer({
+    storage: multer.memoryStorage()
+})
+
 const {createComplaint,
     getAllComplaints,
     getMyComplaints,
@@ -10,8 +15,10 @@ const {protect, admin} = require("../middleware/auth");
 
 
 
+
+
 // student routes
-router.post("/", protect, createComplaint);
+router.post("/", protect, upload.single("photo"), createComplaint);
 router.get("/my", protect, getMyComplaints);
 
 // admin routes
